@@ -32,7 +32,7 @@ void Player::setPlayer(float x, float y)
 	// Changes the color of the player drawn (m_rectangle), and its size
 	m_rectangle.setFillColor(sf::Color::Black);
 	m_rectangle.setSize(sf::Vector2f(PLAYER_SIZE, PLAYER_SIZE));
-    max_jump_height = 3*(TILE_SIZE);
+    max_jump_height = 5*(TILE_SIZE);
     jump_time = (-max_jump_height) / (jump_speed);
 }
 
@@ -170,17 +170,20 @@ void Player::controls(float dt)
 		setSpeed(jump_speed, Vector2b(0, 1));
 		//setAcceleration(-GRAVITY, Vector2b(0, 1));
 		jump_time = 0.f;
+        last_x = getPosition().x;
 	}
 	// If the jump key is released or the jump height is over the limit
 	// set the speed to the height of the jump, and re-enable the gravity
 	// reset the jump height and jump time to 0
 	else if (!onGround && (m_controls.isKeyReleased(Controls::Button::jump) || jump_height >= max_jump_height || jump_time >= max_jump_time) && isJumping) {
-		setSpeed(0, Vector2b(0,1));
+	    std::cout << (jump_time >= max_jump_time) << ", " << (jump_height >= max_jump_height) << std::endl;
+    	setSpeed(0, Vector2b(0,1));
 		//setAcceleration(0, Vector2b(false, true));
 		jump_height = 0.f;
 		jump_time = 0.f;
 		isJumping = false;
 	    falling = true;
+        max_d = abs(getPosition().x - last_x);
     }
 
     if (!m_controls.isKeyPressed(Controls::Button::jump))
@@ -411,6 +414,13 @@ void Player::update_player(float dt)
         v = std::string(c);
         text = sf::Text(v, (*m_hud).getFont(), 20);
         text.setPosition(0, 6*20);
+        text.setColor(sf::Color::White);
+        (*m_hud).addText(text); 
+        
+        sprintf(c, "Max distance: %.2f, current: %.2f", max_d, abs(getPosition().x - last_x));
+        v = std::string(c);
+        text = sf::Text(v, (*m_hud).getFont(), 20);
+        text.setPosition(0, 7*20);
         text.setColor(sf::Color::White);
         (*m_hud).addText(text); 
     }

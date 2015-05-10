@@ -11,7 +11,7 @@
 
 int main(int argc, char* argv[])
 {
-	sf::RenderWindow window(sf::VideoMode(640, 480), CONCAT("Alpha build ", VERSION));
+	sf::RenderWindow window(sf::VideoMode(1280, 720), CONCAT("Alpha build ", VERSION));
 
 	Tilemap m_tilemap;
 	if (!m_tilemap.load("assets/map.txt")) {

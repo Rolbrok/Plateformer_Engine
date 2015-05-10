@@ -50,10 +50,18 @@ private:
     float portal_timeout = 0.2f;
     bool teleported = false;
 
+	bool isJumping = false;
+	float jump_time = 0.f;
+	float max_jump_time = 0.55f;
+
+	float jump_speed = -448.f;
+	float jump_height = 0.f;
+	float max_jump_height = 175.f;
+
 	float speed1 = 6, speed2 = 10;
 	float min_speed = 20.f;
-	float max_walking_speed = 250.f;
-	float max_running_speed = 400.f;
+	float max_walking_speed = (8*TILE_SIZE)/max_jump_time;
+    float max_running_speed = (16*TILE_SIZE)/max_jump_time;
 
 	bool falling = false;
 	float fall_time = 0.f;
@@ -62,14 +70,6 @@ private:
 	bool onGround = false;
 	float last_ground;
 	float last_speed = 0;
-
-	bool isJumping = false;
-	float jump_time = 0.f;
-	float max_jump_time = 0.55f;
-
-	float jump_speed = -448.f;
-	float jump_height = 0.f;
-	float max_jump_height = 175.f;
 
 	bool checkCollision = false;
 	Tilemap t_m;
@@ -84,6 +84,9 @@ private:
 
     float max_f = 0.f;
     float max_h = 0.f;
+    float max_d = 0.f;
+
+    float last_x = 0.f;
 
     bool released = true;
 
