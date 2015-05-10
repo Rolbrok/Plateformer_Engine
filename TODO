@@ -1,0 +1,7 @@
+- Scaling system to have the same render on every window size / machine
+- Creating a Resource manager, that loads at the start of the game, so it doesn't have to load it every time
+- Changing sf::Rectangle to sf::Sprite, using textures from the resource manager
+- Tween librarie to add animations
+- Small GUI, menu...
+- Settings system (pretty easy, will do at teh end)
+- HUD with other things than text

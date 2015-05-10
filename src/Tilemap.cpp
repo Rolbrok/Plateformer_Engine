@@ -21,6 +21,8 @@ bool Tilemap::load(std::string filename)
 		std::cout << "Cannot open file. Aborting." << std::endl;
 		return false;
 	} else {
+	    // For the max size of the map
+        sf::Vector2i curr_max = sf::Vector2i(0, 0);
 
 		// three vectors for the portals
 		// One for each done portal (works with the number)
@@ -34,14 +36,18 @@ bool Tilemap::load(std::string filename)
 		// Reads between the commas the number of the block, and add it to the _map vector
 		std::string line;
 		for (size_t y = 0; std::getline(_file, line); y++) {
-
-			// Increments the size of the _map vector (We add a line)
+            if ((int)y > curr_max.y)
+                curr_max.y = (int)y;
+			
+            // Increments the size of the _map vector (We add a line)
 			_map.resize(_map.size() + 1);
 
 			// Reads between the commas
 			std::string chars;
 			std::stringstream ss_line(line);
 			for (size_t x = 0; std::getline(ss_line, chars, ','); x++) {
+                if ((int)x > curr_max.x)
+                    curr_max.x = (int)x;
 
 				// We add the corresponding number to the end of the current map line
 				_map[y].push_back(atoi(chars.c_str()));
@@ -113,7 +119,10 @@ bool Tilemap::load(std::string filename)
 		block_ground.setPosition(0.f, (float)_map.size()*TILE_SIZE);
 		block_ground.setSize((float)(_map[0].size() * 2)*TILE_SIZE);
 		_bounds.push_back(block_ground);
-	}
+    
+        curr_max += sf::Vector2i(1, 1);
+        setMax(curr_max*TILE_SIZE);
+    }
 
 	// The file loading worked
 	return true;
@@ -194,6 +203,21 @@ float Tilemap::getAngle(sf::FloatRect player)
         if (_bounds[i].getAngle() != 0 && player.intersects(_bounds[i].getGlobalBounds()))
             return _bounds[i].getAngle();
     }
+}
+
+sf::Vector2i Tilemap::getMaxPos()
+{
+    return max_pos;
+}
+
+void Tilemap::setMax(int x, int y)
+{
+    max_pos = sf::Vector2i(x, y);
+}
+
+void Tilemap::setMax(sf::Vector2i new_max)
+{
+    max_pos = new_max;
 }
 
 Block Tilemap::getBlock(int c, float x, float y, float size) const

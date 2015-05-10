@@ -20,7 +20,7 @@ class Tilemap : public sf::Drawable, Collision
 {
 public:
 	// Defines the collisions that can occurs during the check
-	enum class Collision_Type {  right, left, down, down_left, down_right, collision, dangerous, portal, slide, none };
+	enum class Collision_Type { right, left, down, down_left, down_right, collision, dangerous, portal, slide, none };
 
 public:
 	Tilemap();
@@ -38,6 +38,9 @@ public:
     // Returns the angle of the block slide being collided
     float getAngle(sf::FloatRect player);
 
+    // Returns the maximum size of the map
+    sf::Vector2i getMaxPos();
+
 	// checks if the collision is down
 	bool isDown(Collision_Type col);
 
@@ -49,10 +52,17 @@ public:
 	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 
 private:
+    void setMax(int x, int y);
+    void setMax(sf::Vector2i new_max);
+
+private:
 	// The _map is the 2 dimensional array that contains the number of each block
 	std::vector < std::vector <int> > _map;
 	// The _bounds is the array containing all the blocks, used for the collision and the drawing
 	std::vector < Block > _bounds;
+
+    // The map maximum size (for the boundaries)
+    sf::Vector2i max_pos;
 };
 
 #endif

@@ -7,6 +7,7 @@
 #include <SFML/Graphics/RenderTarget.hpp> /* RenderTarget */
 #include <SFML/Graphics/RenderStates.hpp> /* RenderStates */
 #include <SFML/Graphics/Drawable.hpp> /* For Drawable */
+#include <SFML/Graphics/View.hpp> /* for sf::View */
 #include <SFML/Graphics/Font.hpp> /* for sf::Font */
 #include "Entity.h" /* For Entity */
 #include "Controls.h" /* For keyboard implementation */
@@ -27,8 +28,9 @@ public:
 
 	void update_player(float dt);
 
-	void setTilemap(Tilemap tm);
+	void setTilemap(Tilemap *tm);
 	void setHUD(HUD *new_hud);
+    void setView(sf::View *new_view);
 
 	sf::FloatRect getGlobalBounds();
 
@@ -47,7 +49,7 @@ private:
 
 	sf::RectangleShape m_rectangle;
 
-    float portal_timeout = 0.2f;
+    float portal_timeout = 0.5f;
     bool teleported = false;
 
 	bool isJumping = false;
@@ -72,7 +74,7 @@ private:
 	float last_speed = 0;
 
 	bool checkCollision = false;
-	Tilemap t_m;
+	Tilemap *t_m;
 
 	HUD *m_hud;
 	bool hud_available = false;
@@ -90,8 +92,13 @@ private:
 
     bool released = true;
 
+    float wall_accel = 10.f;
+
     bool debug = true;
     bool flying = false;
+
+    sf::View *m_view;
+    Vector2b follow = Vector2b(false, false);
 };
 
 #endif

@@ -11,21 +11,26 @@
 
 int main(int argc, char* argv[])
 {
-	sf::RenderWindow window(sf::VideoMode(1280, 720), CONCAT("Alpha build ", VERSION));
+	sf::RenderWindow window(sf::VideoMode(900, 506), CONCAT("Alpha build ", VERSION));
+    window.setFramerateLimit(120);
 
 	Tilemap m_tilemap;
 	if (!m_tilemap.load("assets/map.txt")) {
 		return 1;
 	}
+
+    sf::Vector2f window_size = sf::Vector2f(window.getSize().x, window.getSize().y);
 	
-	Player m_player(16,16);
+	Player m_player(0, 50);
 	m_player.setGround((float)window.getSize().y);
-	m_player.setTilemap(m_tilemap);
+	m_player.setTilemap(&m_tilemap);
 
     HUD m_hud;
+    m_hud.setFont("assets/font.ttf");
     m_player.setHUD(&m_hud);
 
-    m_hud.setFont("assets/font.ttf");
+    sf::View m_view(sf::FloatRect(0, 0, window_size.x, window_size.y));
+    m_player.setView(&m_view);
 
 	sf::Clock m_clock;
 
@@ -58,7 +63,7 @@ int main(int argc, char* argv[])
         std::ostringstream f;
         f << (int)fps;
         sf::Text t_fps(f.str(), m_hud.getFont(), 20);
-        t_fps.setPosition((float)window.getSize().x-3*20, 0);
+        t_fps.setPosition(m_view.getCenter().x+m_view.getSize().x/2-3*20, m_view.getCenter().y-m_view.getSize().y/2);
         t_fps.setColor(sf::Color::White);
         m_hud.addText(t_fps);
 
@@ -68,6 +73,8 @@ int main(int argc, char* argv[])
 
 		window.clear(sf::Color(100,100,100));
 
+        window.setView(m_view);
+
 		window.draw(m_tilemap);
 		window.draw(m_player);
         window.draw(m_hud);
@@ -76,7 +83,7 @@ int main(int argc, char* argv[])
 
 		///////////////////////
         m_hud.reset();
-	}
+    }
 
 	return 0;
 }
