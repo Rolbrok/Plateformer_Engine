@@ -11,7 +11,7 @@
 
 int main(int argc, char* argv[])
 {
-	sf::RenderWindow window(sf::VideoMode(900, 506), CONCAT("Alpha build ", VERSION));
+	sf::RenderWindow window(sf::VideoMode(640, 480), CONCAT("Alpha build ", VERSION));
     window.setFramerateLimit(120);
 
 	Tilemap m_tilemap;

@@ -413,8 +413,8 @@ void Player::update_player(float dt)
             (*m_view).setCenter(getPosition().x, (*m_view).getCenter().y);
         }
     }
-   
-/bin/bash: q:wq: command not found
+  
+    if ((*t_m).getMaxPos().y > (*m_view).getSize().y) { 
         if (getPosition().y < (*m_view).getSize().y/2) {
             (*m_view).setCenter((*m_view).getCenter().x, (*m_view).getSize().y/2);
         } else if (getPosition().y > (*t_m).getMaxPos().y - (*m_view).getSize().y/2) {
