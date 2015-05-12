@@ -22,7 +22,7 @@ sf::Vector2f vector_angle(sf::Vector2f v_start, sf::Vector2f v_end, float angle)
 
     sf::Vector2f destination;
     destination.x = v_end.x;
-    destination.y = v_end.y +- (abs(V.x)*cos(angle))/cos(90-abs(angle));
+    destination.y = v_end.y - (abs(V.x)*cos(angle))/cos(90-abs(angle));
 
     return destination;
 }

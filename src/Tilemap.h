@@ -16,7 +16,7 @@
 #include "Blocks.h" /* red block */
 #include "Collision.h"
 
-class Tilemap : public sf::Drawable, Collision
+class Tilemap : public sf::Drawable
 {
 public:
 	// Defines the collisions that can occurs during the check

@@ -156,7 +156,7 @@ std::pair<Tilemap::Collision_Type, sf::Vector2f> Tilemap::collision(sf::FloatRec
         }
 
 		// Temporary move_point with the side and the movement of the collision
-		std::pair<Side, sf::Vector2f> move_point = getMovingPoint(player, _bounds[i]);
+		std::pair<Collision::Side, sf::Vector2f> move_point = Collision::getMovingPoint(player, _bounds[i].getGlobalBounds());
 		// Adds the move_point position to the position
 		pos += move_point.second;
 		

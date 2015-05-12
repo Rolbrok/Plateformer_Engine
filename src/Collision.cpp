@@ -1,13 +1,7 @@
 #include "Collision.h"
 
-std::pair<Collision::Side, sf::Vector2f>Collision::getMovingPoint(sf::FloatRect player, Block block)
+std::pair<Collision::Side, sf::Vector2f> Collision::getMovingPoint(sf::FloatRect player, sf::FloatRect block)
 {
-	// If the block is not a solid, do not check the collision
-	// returns no move
-	if (!block.solid()) {
-		return std::make_pair(Side::none, sf::Vector2f(0, 0));
-	}
-
 	// return_point is the point that will be added to the player's position
 	// The area is the area of the player in the block
 	sf::Vector2f return_point(0, 0);
@@ -15,7 +9,7 @@ std::pair<Collision::Side, sf::Vector2f>Collision::getMovingPoint(sf::FloatRect 
 
 	// If there is no intersection between the block and the player
 	// returns no move
-	if (!player.intersects(block.getGlobalBounds(), area)) {
+	if (!player.intersects(block, area)) {
 		return std::make_pair(Side::none, return_point);
 	}
 
