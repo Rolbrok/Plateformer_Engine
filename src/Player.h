@@ -19,68 +19,73 @@ enum Move { left, right, none };
 class Player : public Entity, public sf::Drawable
 {
 public:
-	Player();
-	Player(float x, float y);
-	Player(sf::Vector2f pos);
+    Player();
+    Player(float x, float y);
+    Player(sf::Vector2f pos);
     ~Player();
 
-	void setPlayer(float x, float y);
+    void setPlayer(float x, float y);
 
-	void update_player(float dt);
+    void update_player(float dt);
 
-	void setTilemap(Tilemap *tm);
-	void setHUD(HUD *new_hud);
+    void setTilemap(Tilemap *tm);
+    void setHUD(HUD *new_hud);
     void setView(sf::View *new_view);
 
-	sf::FloatRect getGlobalBounds();
+    sf::FloatRect getGlobalBounds();
 
-	size_t size();
+    size_t size();
 
-	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
+    virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 
 private:
-	void controls(float dt);
+    void controls(float dt);
     void fly(float dt);
+    void collision(float dt);
+    void interactions(float dt);
+    void debug_informations();
 
 private:
-	Controls m_controls;
-	Controls::Move last_direction = Controls::Move::none;
-	Tilemap::Collision_Type last_collision;
+    Controls m_controls;
+    Controls::Move last_direction = Controls::Move::none;
+    Tilemap::Collision_Type last_collision;
 
-	sf::RectangleShape m_rectangle;
+    sf::RectangleShape m_rectangle;
 
     float portal_timeout = 0.5f;
     bool teleported = false;
 
-	bool isJumping = false;
-	float jump_time = 0.f;
-	float max_jump_time = 0.55f;
+    float boost_timeout = 0.3f;
 
-	float jump_speed = -448.f;
-	float jump_height = 0.f;
-	float max_jump_height = 175.f;
+    bool isJumping = false;
+    float jump_time = 0.f;
+    float max_jump_time = 0.55f;
 
-	float speed1 = 6, speed2 = 10;
-	float min_speed = 20.f;
-	float max_walking_speed = (8*TILE_SIZE)/max_jump_time;
+    float jump_speed = -448.f;
+    float jump_height = 0.f;
+    float max_jump_height = 175.f;
+
+    float speed1 = 6, speed2 = 10;
+    float min_speed = 20.f;
+    float max_walking_speed = (8*TILE_SIZE)/max_jump_time;
     float max_running_speed = (16*TILE_SIZE)/max_jump_time;
 
-	bool falling = false;
-	float fall_time = 0.f;
-	float max_fall_time = 0.1f;
+    bool falling = false;
+    float fall_time = 0.f;
+    float max_fall_time = 0.1f;
 
-	bool onGround = false;
-	float last_ground;
-	float last_speed = 0;
+    bool onGround = false;
+    float last_ground;
+    float last_speed = 0;
 
-	bool checkCollision = false;
-	Tilemap *t_m;
+    bool checkCollision = false;
+    Tilemap *t_m;
 
-	HUD *m_hud;
-	bool hud_available = false;
+    HUD *m_hud;
+    bool hud_available = false;
 
-	float reactivity_percentage = 0.008f;
-	float anti_friction = 0.06f;
+    float reactivity_percentage = 0.008f;
+    float anti_friction = 0.06f;
 
     bool sliding = false;
 

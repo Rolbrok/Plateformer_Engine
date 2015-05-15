@@ -34,17 +34,8 @@ public:
 
 	void setAngle(float new_angle);
 
-	// Creates a portal (to another DIMENSIOOONN !! oh, wait no, to another point)
-	void createPortal(sf::Vector2f pos);
-
-	// Returns important values needed
-	// like the teleport point, if the solid is a portal, a solid, or dangerous
-	// Or the position, the bounds
-	sf::Vector2f getTeleportPoint();
-
 	bool solid();
 	bool dangerous();
-	bool isPortal();
 
 	float getAngle();
     sf::Vector2f getEquationFactor();
@@ -63,8 +54,6 @@ private:
 	// Some block properties
 	bool collides = true;
 	bool trap = false;
-	bool portal = false;
-	sf::Vector2f teleport_to = sf::Vector2f(-1,-1);
 
 	float angle = 0.f;
 };

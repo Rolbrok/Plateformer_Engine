@@ -145,9 +145,9 @@ void Player::controls(float dt)
     // If the speed is too high
     // sets it the maximum
     // Handles if the player is running or walking
-    if (!m_controls.sprint_pressed && signof(getSpeed().x)*getSpeed().x >= max_walking_speed)
+    if (!m_controls.sprint_pressed && signof(getSpeed().x)*getSpeed().x >= max_walking_speed && boost_timeout <= 0.f)
         setSpeed(signof(getSpeed().x)*max_walking_speed, Vector2b(1, 0));
-    else if (signof(getSpeed().x)*getSpeed().x >= max_running_speed)
+    else if (signof(getSpeed().x)*getSpeed().x >= max_running_speed && boost_timeout <= 0.f)
         setSpeed(signof(getSpeed().x)*max_running_speed, Vector2b(1, 0));
 
     // Add the delta time to the falling time if the player is falling
@@ -245,38 +245,14 @@ void Player::fly(float dt)
     m_controls.update();
 }
 
-void Player::update_player(float dt)
+void Player::collision(float dt)
 {
-    // Order of process:
-    // - Controls : sets the speed, acceleration of the player
-    // - Entity::update : applies speed, acceleration to the position
-    // - Collision checking : check for collision with the new position and updates
-
-    // Checks the controls if not flying
-    if (!flying) controls(dt);
-    else fly(dt);
-
-    // Updates the player
-    // this function is from the class Entity
-    // from which the Player class is inherited
-    // Changes the position, and updates the speed and acceleration
-    update(dt);
-
     // If a tilemap has been set, we can check the collisions between the player and the blocks
     if (checkCollision && (getSpeed().y != 0) && !flying) {
 
-        // Checks if the player can  teleport again
-        if (teleported) {
-            portal_timeout -= dt;
-            if (portal_timeout <= 0) {
-                teleported = false;
-                portal_timeout = 0.2f;
-            }
-        }
-    
         // Get the collision pair from the Tilemap class
         // Return a pair of collision with a position, from where to move
-        std::pair<Tilemap::Collision_Type, sf::Vector2f> collisions = (*t_m).collision(getGlobalBounds(), (last_collision != Tilemap::Collision_Type::portal && !teleported));
+        std::pair<Tilemap::Collision_Type, sf::Vector2f> collisions = (*t_m).collision(getGlobalBounds());
 
         // Check if the player is falling
         if ((*t_m).isDown(collisions.first)) {
@@ -305,12 +281,6 @@ void Player::update_player(float dt)
         // If the collision was dangerous (a trap), reset the player to the position defined for now as { 16, 16 }
         // Then updates the position
         switch (collisions.first) {
-        case Tilemap::Collision_Type::portal:
-            if (last_collision != collisions.first && !teleported) {
-                setPosition(collisions.second);
-                teleported = true;
-            }
-            break;
         case Tilemap::Collision_Type::collision:
             setPosition(collisions.second);
             setSpeed(0, Vector2b(0, 1));
@@ -355,9 +325,6 @@ void Player::update_player(float dt)
         else if (collisions.first == Tilemap::Collision_Type::right || collisions.first == Tilemap::Collision_Type::down_right) {
             last_collision = Tilemap::Collision_Type::right;
         }
-        else if (collisions.first == Tilemap::Collision_Type::portal) {
-            last_collision = Tilemap::Collision_Type::portal;
-        }
         else if ((*t_m).isDown(collisions.first)) {
             last_collision = Tilemap::Collision_Type::down;
         }
@@ -376,7 +343,58 @@ void Player::update_player(float dt)
             setAngle(0);
         }
     }
+}
 
+void Player::interactions(float dt)
+{
+    std::pair<Interactable::Interaction_Type, sf::Vector2f> inter = (*t_m).interactions(getGlobalBounds(), getSpeed());
+
+    // Checks if the player can  teleport again
+    if (teleported) {
+        portal_timeout -= dt;
+        if (portal_timeout <= 0) {
+            teleported = false;
+            portal_timeout = 0.8f;
+        }
+    }
+
+    boost_timeout -= dt;
+    
+    switch (inter.first) {
+    case Interactable::Interaction_Type::portal:
+        if (!teleported) {
+            setPosition(inter.second);
+            portal_timeout = 0.8f;
+            teleported = true;
+        }
+        break;
+    case Interactable::Interaction_Type::speed_up:
+        boost_timeout = 0.5f; 
+        setSpeed(inter.second.x, Vector2b(1, 0));
+        break;
+    }
+}
+
+void Player::update_player(float dt)
+{
+    // Order of process:
+    // - Controls : sets the speed, acceleration of the player
+    // - Entity::update : applies speed, acceleration to the position
+    // - Collision checking : check for collision with the new position and updates
+
+    // Checks the controls if not flying
+    if (!flying) controls(dt);
+    else fly(dt);
+
+    // Updates the player
+    // this function is from the class Entity
+    // from which the Player class is inherited
+    // Changes the position, and updates the speed and acceleration
+    update(dt);
+    
+    interactions(dt);
+    collision(dt);
+ 
     // Checks the boundaries (Bottom screen, top screen, left, and right end of the map)
     if (getPosition().y <= 0)
     {
@@ -401,7 +419,7 @@ void Player::update_player(float dt)
     // Changes the position of the object drawn to the screen (for now sf::RectangleShape)
     m_rectangle.setPosition(getPosition());
     m_rectangle.setRotation(getAngle());
-
+    
     // Changes the view
     // Side-scoller code
     // Only changes if the map is bigger that can be seen
@@ -425,6 +443,29 @@ void Player::update_player(float dt)
         }
     }
     
+    debug_informations();
+}
+
+sf::FloatRect Player::getGlobalBounds()
+{
+    // Returns the bounds of the player, defines as
+    // left = position.x, top = position.y, width = player_size, height = player_size
+    return sf::FloatRect(getPosition().x, getPosition().y, PLAYER_SIZE, PLAYER_SIZE);
+}
+
+void Player::setHUD(HUD *new_hud)
+{
+    m_hud = new_hud;
+    hud_available = true;
+}
+
+void Player::setView(sf::View *new_view)
+{
+    m_view = new_view;
+}
+
+void Player::debug_informations()
+{
     // Debug information
     // Relative to the side-scrolling   
     if (hud_available && debug) {  
@@ -502,22 +543,4 @@ void Player::update_player(float dt)
         text.setColor(sf::Color::White);
         (*m_hud).addText(text); 
     }
-}
-
-sf::FloatRect Player::getGlobalBounds()
-{
-    // Returns the bounds of the player, defines as
-    // left = position.x, top = position.y, width = player_size, height = player_size
-    return sf::FloatRect(getPosition().x, getPosition().y, PLAYER_SIZE, PLAYER_SIZE);
-}
-
-void Player::setHUD(HUD *new_hud)
-{
-    m_hud = new_hud;
-    hud_available = true;
-}
-
-void Player::setView(sf::View *new_view)
-{
-    m_view = new_view;
 }
